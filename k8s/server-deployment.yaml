@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: ljinan/multi-server
+          #multi-server image containers a few key value pair configurations that needs to be used to access postgres/redis. these configurations also need to be added
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379'
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: '5432'
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              #name of the environment variable, not at all related to the secret, can be totally different
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  #name of the secret created
+                  key: PGPASSWORD
+                  #key of the key value pair

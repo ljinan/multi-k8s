@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: web
+  template:
+  #same indentation layer as as selector:
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          image: ljinan/multi-client
+          ports:
+            - containerPort: 3000
+
+    # Pods: Runs one or more closely related containers
+    # Services: sets up networking in a k8s cluster
+      # ClusterIP: exposes a set of pods to other objects in the cluster, allows other objects within the node to access any pod that the cluster ip is configured to
+      #            Without the ClusterIP, nothing can connect to the pods
+      #            But it still does not allow traffic from the outside world to access the pod. only objects within the same cluster
+      #            for traffic from the outside world to connect to any of the clusters, they have to go through the Ingress service.
+      # NodePort: exposes a set of pods to the outside world (only good for dev purposes!)
+      # LoadBalancer
+      # Ingress

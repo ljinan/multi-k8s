@@ -1,0 +1,31 @@
+we use persistent volume claim (PVC) for database data storage
+if the data is stored in the database container itself and the containers dies, the database will restarted but the data inside the previous container will be deleted permanently
+therefore data will be stored in a pvc for database
+why do we not increase the database replica to 2?
+    will have conflict if both databases instances are trying to connect to the pvc at the same time
+
+3 types of volumes in kubernetes
+    volume
+    persistent volume
+    persitent volume claim
+
+volume acts as a file system within the pod(belongs to or associated with the pod) to allow containers to read/store data from the volumes
+even if the container dies, the volume will still be maintained and the container can continue reading the filesystem from the volume
+however, volumes are vulnerable to pod crashes. if the pod crashes, the volume will still be deleted permanently
+
+persistent volume creates a long term storage exist outside of the pod and is not tied to any pod or specific container
+if the pod or container dies and get recreated, it can still connect to the persistent volume
+
+volume -> tied to the life cycle of the pod
+persistent volume -> last for all time or unless otherwise deleted
+
+ persistent volume claim are requests from user/pod config for storage
+ when a pod config ask for a persistent volume
+    if a persistent volume is created ahead of time, it is a statically provisioned persistent volume
+    if a persistent volume is not catered for and only created when a pod config ask for it, the persistent volume will be created and it is a dynamically provisioned persistent volume
+
+Access modes:
+    ReadWriteOnce -> can be used by a single node only
+    ReadOnlyMany -> multiple nodes can read from this at the same time
+    ReadWriteMany -> can be read and written to by many nodes at the same time
+
