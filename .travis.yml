@@ -2,10 +2,35 @@ sudo: required
 services:
   - docker
 before_install:
-  # - add openssl command here provided by travis
+  # add openssl command here provided by travis
+  # openssl aes-256-cbc -K $encrypted_*******_key -iv $encrypted_ ****
+  # command should look something like above
+  # after this command runs, it decrypts the file and places it into the root project directory
+  # running the command gcloud auth and calling the key file, it has already been deencrypted into the project directory
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
   - gcloud components update kubectl
   - gcloud auth activate-service-account --key-file service-account.json
   # credentials for the service account will be placed within the service-account.json
   # service account on google is similar to IAM user on AWS
+  - gcloud config set project <project ID>
+  # setting project name
+  # open up the project selector and you can see the project name and ID. give the ID
+  # open up navigation menu, under kubernetes engine, find the default compute zone
+  - gcloud config set compute/zone us-central1-a
+  # setting compute zone
+  - gcloud container clusters get-credentials multi-cluster
+  # setting which kubernetes cluster to work with
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # getting password from the input into the command
+  - docker build -t ljinan/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run ljinan/react-test npm test -- --coverage
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
+  
