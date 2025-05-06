@@ -1,6 +1,11 @@
 sudo: required
 services:
   - docker
+env:
+  global:
+    - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    # used to disable any prompts from gcloud that requires user inputs
 before_install:
   # add openssl command here provided by travis
   # openssl aes-256-cbc -K $encrypted_*******_key -iv $encrypted_ ****
