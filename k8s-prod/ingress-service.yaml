@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations: 
+  # additional config options that specify higher level config around the Ingress object that gets created
+    # kubernetes.io/ingress.class: nginx
+    # REMOVE CLASSNAME ANNOTATION
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    # ADD ANNOTATION
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # ADD ANNOTATION
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    #always ensures a https connection from users
+spec:
+  tls:
+    - hosts:
+        - <yourdomainname>.com
+        - www.<yourdomainname>.com
+      secretName: <yourdomainname>-com
+  ingressClassName: nginx
+  # ADD INGRESSCLASSNAME FIELD
+  rules:
+    - host: <yourdomainname>.com
+      http:
+        paths:
+          - path: /?(.*)
+            # UPDATE PATH
+            pathType: ImplementationSpecific
+            # ADD PATHTYPE
+            # 2 possible path to map traffic to
+            #for any path that is route to / or /<anything besides api>, send all this traffic to client-cluster-ip-service
+            backend:
+              service:
+                # UPDATE SERVICE FIELDS
+                name: client-cluster-ip-service
+                # refer to the name stated in the client-cluster-ip-service.yaml file
+                port:
+                  number: 3000
+          - path: /api/?(.*)
+            # UPDATE PATH
+            pathType: ImplementationSpecific
+            # ADD PATHTYPE
+            backend:
+              service:
+                # UPDATE SERVICE FIELDS
+                name: server-cluster-ip-service
+                port:
+                  number: 5000
+  #the rules only apply to the <yourdomainname>.com and does not apply to www.<yourdomainname>.com. need to copy a 2nd block
+    - host: www.<yourdomainname>.com
+      http:
+        paths:
+          - path: /?(.*)
+            # UPDATE PATH
+            pathType: ImplementationSpecific
+            # ADD PATHTYPE
+            # 2 possible path to map traffic to
+            #for any path that is route to / or /<anything besides api>, send all this traffic to client-cluster-ip-service
+            backend:
+              service:
+                # UPDATE SERVICE FIELDS
+                name: client-cluster-ip-service
+                # refer to the name stated in the client-cluster-ip-service.yaml file
+                port:
+                  number: 3000
+          - path: /api/?(.*)
+            # UPDATE PATH
+            pathType: ImplementationSpecific
+            # ADD PATHTYPE
+            backend:
+              service:
+                # UPDATE SERVICE FIELDS
+                name: server-cluster-ip-service
+                port:
+                  number: 5000

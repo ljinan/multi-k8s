@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: <yourdomainname>-com-tls
+spec:
+  secretName: <yourdomainname>-com
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: <yourdomainname>.com
+  dnsNames:
+    - <yourdomainname>.com
+    - www.<yourdomainname>.com
+  # list of all the domains that is going to be associated with your certificate
+  # if user goes to either of the addresses list above, the certificate is going to cover
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - <yourdomainname>.com
+          - www.<yourdomainname>.com
+        # used for verification process between the cert provider and the cluster
